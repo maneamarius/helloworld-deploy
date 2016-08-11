@@ -1,0 +1,8 @@
+- name: Install Apache webserver and deploy Hello World app
+  hosts: webservers
+  gather_facts: false
+  sudo: yes
+  serial: 10
+  vars:
+  roles:
+   - role: apache
