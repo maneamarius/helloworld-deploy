@@ -1,4 +1,3 @@
 ---
-
     - name: Install Apache http server
       yum: name=httpd state=present

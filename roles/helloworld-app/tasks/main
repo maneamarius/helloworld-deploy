@@ -1,0 +1,28 @@
+---
+
+    - name: Install git
+      yum: name=git state=present
+
+    - name: Copy github private key to destination
+      copy: src=github.priv dest=/root/.ssh/ owner=root group=root mode=600
+
+    - name: Adjust SSH config file for github,com host
+      shell: echo -e "Host github.com\n\tIdentityFile ~/.ssh/github.priv" >> /root/.ssh/config
+
+    - name: Disable strict host checking for github.com
+      shell: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> /root/.ssh/config
+
+    - name: Get latest version of HelloWorld application from Github and move the helloworld.conf file to conf.d
+      shell: cd /var/www/html/ && git clone git@github.com:maneamarius/helloworld-app.git
+
+    - name: Move the heloworld.conf file to conf.d
+      shell: rm -f /etc/httpd/conf.d/*.conf && mv /var/www/html/helloworld-app/helloworld.conf /etc/httpd/conf.d/
+
+    - name: Attach server IP adress to Hello World text (to check load balancer really works)
+      shell: sed -i "s/Hello World!/Hello World! --> {{ ansible_ssh_host }} /g" /var/www/html/helloworld-app/index.html
+
+    - name: Comment out Listen directive in httpd.conf
+      shell: sed -ie '/Listen 80/s/^/#/g' /etc/httpd/conf/httpd.conf
+
+    - name: Restart apache service
+      service: name=httpd state=reloaded

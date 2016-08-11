@@ -6,3 +6,4 @@
   vars:
   roles:
    - role: apache
+   - role: helloworld-app
